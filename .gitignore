@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+*.swp
+
+# Python Backend
+backend/__pycache__/
+backend/*/__pycache__/
+backend/*/*/__pycache__/
+backend/*/*/*/__pycache__/
+backend/*.py[cod]
+backend/*/*.py[cod]
+backend/.env
+backend/.venv/
+backend/venv/
+backend/data/
+backend/*.db
+backend/*.db-wal
+backend/*.db-shm
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/dist/
+backend/build/
+
+# Flutter App
+shared_living_app/.dart_tool/
+shared_living_app/.flutter-plugins-dependencies
+shared_living_app/.pub-cache/
+shared_living_app/.pub/
+shared_living_app/build/
+shared_living_app/.idea/
+shared_living_app/*.iml
+shared_living_app/android/app/debug/
+shared_living_app/android/app/profile/
+shared_living_app/android/app/release/

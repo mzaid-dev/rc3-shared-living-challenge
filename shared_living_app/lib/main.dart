@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'core/theme/app_theme.dart';
+import 'features/auth/data/mock_auth_repository.dart';
+import 'features/auth/data/token_storage.dart';
+import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/auth/presentation/cubit/auth_state.dart';
+import 'features/auth/presentation/screens/login_screen.dart';
+import 'features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'features/expenses/presentation/cubit/expenses_cubit.dart';
+import 'features/navigation/presentation/screens/main_navigation_shell.dart';
+import 'features/shared_living/data/repositories/mock_shared_living_repository.dart';
+import 'features/shared_living/domain/repositories/shared_living_repository.dart';
+import 'features/shopping/presentation/cubit/shopping_cubit.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final tokenStorage = TokenStorage();
+  final authRepository = MockAuthRepository(tokenStorage: tokenStorage);
+  final sharedLivingRepository = MockSharedLivingRepository();
+
+  runApp(MyApp(
+    authRepository: authRepository,
+    sharedLivingRepository: sharedLivingRepository,
+  ));
+}
+
+class MyApp extends StatelessWidget {
+  final AuthRepository authRepository;
+  final SharedLivingRepository sharedLivingRepository;
+
+  const MyApp({
+    super.key,
+    required this.authRepository,
+    required this.sharedLivingRepository,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepository>.value(value: authRepository),
+        RepositoryProvider<SharedLivingRepository>.value(value: sharedLivingRepository),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>(
+            create: (context) => AuthCubit(authRepository: authRepository)..checkAuthStatus(),
+          ),
+          BlocProvider<DashboardCubit>(
+            create: (context) => DashboardCubit(repository: sharedLivingRepository),
+          ),
+          BlocProvider<ShoppingCubit>(
+            create: (context) => ShoppingCubit(repository: sharedLivingRepository),
+          ),
+          BlocProvider<ExpensesCubit>(
+            create: (context) => ExpensesCubit(repository: sharedLivingRepository),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Hisab · Shared Living App',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          home: const AuthGate(),
+        ),
+      ),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        if (state is Authenticated) {
+          return MainNavigationShell(user: state.user);
+        }
+        if (state is AuthLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        return const LoginScreen();
+      },
+    );
+  }
+}
