@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.core.security import hash_password
 from app.db.models import Household, Member, MonthlyBudget, User
 
-DEMO_HOUSEHOLD_NAME = "Gulberg Apartment"
+DEMO_HOUSEHOLD_NAME = "Lahore Apartment"
 DEMO_INVITE_CODE = "LAHORE2026"
 
 DEMO_USERS_MEMBERS = [

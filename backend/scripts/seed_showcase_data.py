@@ -50,21 +50,9 @@ def seed_showcase():
             print("[!] Household not found.")
             return
 
-        # Ensure household name looks great
-        household.name = "Gulberg Apartment"
+        # Ensure household name matches standard
+        household.name = "Lahore Apartment"
         session.flush()
-
-        # Fetch all 3 members (Ali, Ayesha, Bilal)
-        members = session.query(Member).filter_by(household_id=household.id).order_by(Member.code).all()
-        member_map = {m.code: m for m in members}
-        
-        m_ali = member_map.get("M01")
-        m_ayesha = member_map.get("M02")
-        m_bilal = member_map.get("M03")
-
-        if not (m_ali and m_ayesha and m_bilal):
-            print("[!] Need M01, M02, and M03 to exist.")
-            return
 
         print(f"[*] Cleaning old test data for household '{household.name}' ({household.id})...")
 
@@ -82,7 +70,28 @@ def seed_showcase():
         # 3. Delete old shopping items
         session.query(ShoppingItem).filter_by(household_id=household.id).delete(synchronize_session=False)
 
-        # 4. Delete old assistant conversations
+        # 4. Remove extra test members from previous runs
+        extra_members = session.query(Member).filter(
+            Member.household_id == household.id,
+            ~Member.code.in_(["M01", "M02", "M03"])
+        ).all()
+        for em in extra_members:
+            session.delete(em)
+        session.flush()
+
+        # Fetch all 3 members (Ali, Ayesha, Bilal)
+        members = session.query(Member).filter_by(household_id=household.id).order_by(Member.code).all()
+        member_map = {m.code: m for m in members}
+        
+        m_ali = member_map.get("M01")
+        m_ayesha = member_map.get("M02")
+        m_bilal = member_map.get("M03")
+
+        if not (m_ali and m_ayesha and m_bilal):
+            print("[!] Need M01, M02, and M03 to exist.")
+            return
+
+        # 5. Delete old assistant conversations
         h_convs = session.query(AssistantConversation).filter_by(household_id=household.id).all()
         conv_ids = [c.id for c in h_convs]
         if conv_ids:
