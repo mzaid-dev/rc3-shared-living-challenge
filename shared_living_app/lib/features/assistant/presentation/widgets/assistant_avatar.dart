@@ -31,12 +31,12 @@ class HisabAssistantAvatar extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(size * 0.32),
             border: Border.all(
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.jade900.withOpacity(0.18),
+                color: AppColors.jade900.withValues(alpha: 0.18),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

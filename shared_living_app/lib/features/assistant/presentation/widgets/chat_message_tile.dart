@@ -69,7 +69,7 @@ class ChatMessageTile extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.jade900.withOpacity(0.12),
+                    color: AppColors.jade900.withValues(alpha: 0.12),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -95,7 +95,7 @@ class ChatMessageTile extends StatelessWidget {
                         timeStr,
                         style: TextStyle(
                           fontSize: 9.5,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                       if (message.isPending) ...[
@@ -148,7 +148,7 @@ class ChatMessageTile extends StatelessWidget {
                       border: Border.all(color: AppColors.line),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.jade900.withOpacity(0.03),
+                          color: AppColors.jade900.withValues(alpha: 0.03),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),

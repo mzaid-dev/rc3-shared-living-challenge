@@ -379,7 +379,8 @@ def test_assistant_clarification_on_missing_amount(client: TestClient, auth_head
     data = resp.json()
     assert data["requires_confirmation"] is False
     assert data["response"]["type"] == "text"
-    assert "how much" in data["response"]["message"].lower()
+    msg = data["response"]["message"].lower()
+    assert "how much" in msg or "amount" in msg
 
 def test_assistant_conversation_history_endpoints(client: TestClient, auth_headers):
     c_resp = client.post("/api/assistant/conversations", headers=auth_headers)

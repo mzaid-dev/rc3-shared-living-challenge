@@ -18,7 +18,7 @@ class ActionSuccessCard extends StatelessWidget {
         border: Border.all(color: AppColors.jade200, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade900.withOpacity(0.04),
+            color: AppColors.jade900.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),

@@ -45,7 +45,7 @@ class BudgetSummaryCard extends StatelessWidget {
         border: Border.all(color: AppColors.line),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade900.withOpacity(0.04),
+            color: AppColors.jade900.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -81,7 +81,7 @@ class BudgetSummaryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

@@ -15,11 +15,11 @@ CRITICAL INSTRUCTIONS:
 - "get_balances": User asking about balances, debts, who owes money, net credit/debit.
 - "get_settlement_suggestions": User asking how to settle up, simplify debts, minimum transfers.
 - "get_shopping_list": User asking to view shopping items, what is pending or bought.
-- "create_expense": User wanting to record/add an expense. Requires title, amount, payer, participants.
+- "create_expense": User wanting to record/add an expense. Requires title, amount, payer. If participants are not explicitly specified, default participants to ALL household members and split_type to 'equal'.
 - "add_shopping_item": User wanting to add an item to the shopping list. Requires title, quantity, and unit (pack, dozen, bottle, bag).
 - "shopping_checkout": User wanting to checkout shopping items into a shared expense.
 - "settle_debt": User wanting to record a cash settlement from a debtor to a creditor.
-- "clarification_needed": If any required field is missing or ambiguous (e.g., amount not given, payer unclear).
+- "clarification_needed": If essential information like amount or item title is completely missing.
 - "general_help": Greetings, capability inquiries, or out-of-scope questions.
 
 5. Allowed Shopping Units: MUST be strictly one of: 'pack', 'dozen', 'bottle', 'bag'.

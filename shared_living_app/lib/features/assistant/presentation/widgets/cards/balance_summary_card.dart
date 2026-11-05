@@ -31,7 +31,7 @@ class BalanceSummaryCard extends StatelessWidget {
         border: Border.all(color: AppColors.line),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade900.withOpacity(0.04),
+            color: AppColors.jade900.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),

@@ -54,7 +54,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
             height: widget.dotSize,
             margin: const EdgeInsets.symmetric(horizontal: 2.5),
             decoration: BoxDecoration(
-              color: widget.dotColor.withOpacity(
+              color: widget.dotColor.withValues(alpha: 
                 0.4 + (bounce != 0 ? 0.6 : 0.0),
               ),
               shape: BoxShape.circle,
@@ -75,7 +75,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
         border: Border.all(color: AppColors.line),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade900.withOpacity(0.03),
+            color: AppColors.jade900.withValues(alpha: 0.03),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),

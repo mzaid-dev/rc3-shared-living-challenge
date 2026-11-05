@@ -39,13 +39,13 @@ class ConfirmationCard extends StatelessWidget {
         border: Border.all(
           color: isConfirmed
               ? AppColors.jade400
-              : (isCancelled ? AppColors.line : AppColors.amber500.withOpacity(0.6)),
+              : (isCancelled ? AppColors.line : AppColors.amber500.withValues(alpha: 0.6)),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
             color: (isConfirmed ? AppColors.jade600 : AppColors.amber500)
-                .withOpacity(0.08),
+                .withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
