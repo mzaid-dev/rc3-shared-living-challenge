@@ -694,3 +694,4 @@ class AssistantService:
             updated_at=conv.updated_at,
             message_count=0,
         )
+

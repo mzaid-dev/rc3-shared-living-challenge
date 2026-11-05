@@ -61,7 +61,32 @@ class ApiAuthRepository implements AuthRepository {
       );
 
       // Immediately login after successful registration
-      return await login(email, password);
+      final tokens = await login(email, password);
+
+      // Automatically link newly registered user to the apartment household (LAHORE2026)
+      try {
+        await dio.post(
+          '/api/households/join',
+          data: {'invite_code': 'LAHORE2026'},
+        );
+      } catch (_) {
+        try {
+          await dio.post(
+            '/api/households',
+            data: {'name': 'Gulberg 4B Apartment'},
+          );
+        } catch (_) {}
+      }
+
+      // Re-hydrate profile with linked household and member details
+      try {
+        final profile = await me();
+        if (profile != null) {
+          await tokenStorage.saveUser(profile);
+        }
+      } catch (_) {}
+
+      return tokens;
     } on DioException catch (e) {
       _handleDioError(e);
     } catch (e) {

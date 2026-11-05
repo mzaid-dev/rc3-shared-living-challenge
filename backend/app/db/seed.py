@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.core.security import hash_password
 from app.db.models import Household, Member, MonthlyBudget, User
 
-DEMO_HOUSEHOLD_NAME = "Lahore Apartment"
+DEMO_HOUSEHOLD_NAME = "Gulberg Apartment"
 DEMO_INVITE_CODE = "LAHORE2026"
 
 DEMO_USERS_MEMBERS = [
@@ -41,7 +41,11 @@ def seed_demo_data(session: Session) -> bool:
     - Running multiple times leaves the database in the exact same state without resetting or duplicating data.
     """
     # 1. Ensure Household
-    household = session.query(Household).filter_by(name=DEMO_HOUSEHOLD_NAME).first()
+    household = (
+        session.query(Household)
+        .filter((Household.name == DEMO_HOUSEHOLD_NAME) | (Household.invite_code == DEMO_INVITE_CODE))
+        .first()
+    )
     if not household:
         household = Household(
             name=DEMO_HOUSEHOLD_NAME,
@@ -50,6 +54,9 @@ def seed_demo_data(session: Session) -> bool:
             invite_code=DEMO_INVITE_CODE,
         )
         session.add(household)
+        session.flush()
+    elif household.name != DEMO_HOUSEHOLD_NAME:
+        household.name = DEMO_HOUSEHOLD_NAME
         session.flush()
 
     # 2. Ensure Demo Users and Members

@@ -62,3 +62,4 @@ class ConversationDetail(BaseModel):
     created_at: datetime
     updated_at: datetime
     messages: List[ConversationMessage]
+

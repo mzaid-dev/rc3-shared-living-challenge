@@ -54,7 +54,7 @@ class AppFailure extends Equatable implements Exception {
   List<Object?> get props => [code, message, fields];
 
   @override
-  String toString() => 'AppFailure($code): $message';
+  String toString() => message;
 }
 
 class NetworkFailure extends AppFailure {

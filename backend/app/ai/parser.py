@@ -216,3 +216,4 @@ class RuleBasedIntentParser:
             "entities": {},
             "message": "I can help with household expenses, monthly budget, member balances, shopping list, and settlements. What would you like to do?",
         }
+

@@ -14,6 +14,30 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
 
   ApiSharedLivingRepository({required this.dio});
 
+  Future<void> _autoJoinHouseholdIfOrphaned() async {
+    try {
+      await dio.post(
+        '/api/households/join',
+        data: {'invite_code': 'LAHORE2026'},
+      );
+    } catch (_) {
+      try {
+        await dio.post(
+          '/api/households',
+          data: {'name': 'Gulberg 4B Apartment'},
+        );
+      } catch (_) {}
+    }
+  }
+
+  bool _isMissingHousehold(DioException e) {
+    if (e.response?.statusCode == 404 && e.response?.data is Map) {
+      final detail = e.response!.data['detail']?.toString().toLowerCase() ?? '';
+      return detail.contains('household');
+    }
+    return false;
+  }
+
   @override
   Future<List<Member>> getMembers() async {
     try {
@@ -21,6 +45,14 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
       final list = response.data as List<dynamic>;
       return list.map((e) => Member.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
+      if (_isMissingHousehold(e)) {
+        await _autoJoinHouseholdIfOrphaned();
+        try {
+          final retry = await dio.get('/api/members');
+          final list = retry.data as List<dynamic>;
+          return list.map((e) => Member.fromJson(e as Map<String, dynamic>)).toList();
+        } catch (_) {}
+      }
       _handleDioError(e);
     } catch (e) {
       throw AppFailure(code: 'FETCH_MEMBERS_FAILED', message: e.toString());
@@ -34,6 +66,14 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
       final list = response.data as List<dynamic>;
       return list.map((e) => ShoppingItem.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
+      if (_isMissingHousehold(e)) {
+        await _autoJoinHouseholdIfOrphaned();
+        try {
+          final retry = await dio.get('/api/shopping');
+          final list = retry.data as List<dynamic>;
+          return list.map((e) => ShoppingItem.fromJson(e as Map<String, dynamic>)).toList();
+        } catch (_) {}
+      }
       _handleDioError(e);
     } catch (e) {
       throw AppFailure(code: 'FETCH_SHOPPING_FAILED', message: e.toString());
@@ -128,6 +168,13 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
       final response = await dio.get('/api/balances');
       return BalancesResponse.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
+      if (_isMissingHousehold(e)) {
+        await _autoJoinHouseholdIfOrphaned();
+        try {
+          final retry = await dio.get('/api/balances');
+          return BalancesResponse.fromJson(retry.data as Map<String, dynamic>);
+        } catch (_) {}
+      }
       _handleDioError(e);
     } catch (e) {
       throw AppFailure(code: 'FETCH_BALANCES_FAILED', message: e.toString());
@@ -183,6 +230,16 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
       );
       return DashboardResponse.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
+      if (_isMissingHousehold(e)) {
+        await _autoJoinHouseholdIfOrphaned();
+        try {
+          final retry = await dio.get(
+            '/api/dashboard',
+            queryParameters: {'member_id': memberId},
+          );
+          return DashboardResponse.fromJson(retry.data as Map<String, dynamic>);
+        } catch (_) {}
+      }
       _handleDioError(e);
     } catch (e) {
       throw AppFailure(code: 'FETCH_DASHBOARD_FAILED', message: e.toString());

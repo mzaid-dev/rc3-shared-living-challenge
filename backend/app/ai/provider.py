@@ -188,3 +188,4 @@ def get_llm_provider() -> BaseLLMProvider:
     if provider_type in ["groq", "deepseek", "grok", "resilient"]:
         return ResilientLangChainAssistantProvider()
     return LangChainMockProvider()
+
