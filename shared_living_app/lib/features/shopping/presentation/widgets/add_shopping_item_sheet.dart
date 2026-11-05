@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/errors/app_failure.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/idempotency_manager.dart';
@@ -77,9 +78,10 @@ class _AddShoppingItemSheetState extends State<AddShoppingItemSheet> {
           isNetworkOrTimeoutOr5xx: true,
           payload: payloadStr,
         );
+        final msg = e is AppFailure ? e.message : e.toString().replaceFirst(RegExp(r'^[^:]*:\s*'), '');
         setState(() {
           _isSubmitting = false;
-          _errorMessage = e.toString();
+          _errorMessage = msg.isNotEmpty ? msg : 'Unable to add item. Please try again.';
         });
       }
     }
@@ -138,15 +140,27 @@ class _AddShoppingItemSheetState extends State<AddShoppingItemSheet> {
 
           if (_errorMessage != null) ...[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
                 color: AppColors.coral50,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.coral100),
               ),
-              child: Text(
-                _errorMessage!,
-                style: const TextStyle(color: AppColors.coral700, fontSize: 12, fontWeight: FontWeight.w600),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline_rounded, color: AppColors.coral600, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(
+                        color: AppColors.coral700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 14),
