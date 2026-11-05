@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../auth/domain/models/auth_user.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
 import '../widgets/hero_financial_carousel.dart';
@@ -12,11 +13,13 @@ import '../widgets/recent_expenses_card.dart';
 class HomeDashboardScreen extends StatelessWidget {
   final VoidCallback onNavigateToShopping;
   final VoidCallback onNavigateToExpenses;
+  final AuthUser? authUser;
 
   const HomeDashboardScreen({
     super.key,
     required this.onNavigateToShopping,
     required this.onNavigateToExpenses,
+    this.authUser,
   });
 
   @override
@@ -55,7 +58,14 @@ class HomeDashboardScreen extends StatelessWidget {
         }
 
         if (state is DashboardLoaded) {
-          final activeMemberName = state.dashboardData.member.name;
+          final effectiveAuthUser = authUser;
+          final greetingName = effectiveAuthUser?.name.isNotEmpty == true
+              ? effectiveAuthUser!.name
+              : state.dashboardData.member.name;
+          final isViewingSelf = effectiveAuthUser != null && effectiveAuthUser.id == state.activeMemberId;
+          final perspectiveSubtitle = isViewingSelf
+              ? 'Personal balance · Lahore Apartment'
+              : 'Viewing ${state.dashboardData.member.name}\'s ledger perspective';
 
           return RefreshIndicator(
             color: AppColors.jade600,
@@ -74,7 +84,7 @@ class HomeDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Assalam-o-Alaikum, $activeMemberName',
+                          'Assalam-o-Alaikum, $greetingName',
                           style: const TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w800,
@@ -83,13 +93,39 @@ class HomeDashboardScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 3),
-                        const Text(
-                          'Gulberg apartment · November 2026',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.slate,
-                          ),
+                        Row(
+                          children: [
+                            if (!isViewingSelf) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                margin: const EdgeInsets.only(right: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.jade600.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'VIEWING PERSPECTIVE',
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.4,
+                                    color: AppColors.jade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            Flexible(
+                              child: Text(
+                                perspectiveSubtitle,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.slate,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -118,6 +154,7 @@ class HomeDashboardScreen extends StatelessWidget {
                     members: state.members,
                     activeMemberId: state.activeMemberId,
                     balances: state.balances,
+                    authenticatedMemberId: effectiveAuthUser?.id,
                     onMemberSelected: (id) {
                       context.read<DashboardCubit>().switchMember(id);
                     },

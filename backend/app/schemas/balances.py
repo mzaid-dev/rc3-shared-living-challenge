@@ -22,3 +22,11 @@ class BalancesResponse(BaseModel):
     members: List[MemberBalanceItem]
     is_balanced: bool
 
+class DebtSimplificationItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    sender_id: str
+    recipient_id: str
+    amount: float
+    amount_paisa: int
+

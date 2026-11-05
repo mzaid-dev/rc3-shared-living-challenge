@@ -30,6 +30,8 @@ class ShoppingCheckoutSheet extends StatefulWidget {
 
 class _ShoppingCheckoutSheetState extends State<ShoppingCheckoutSheet> {
   final _amountController = TextEditingController(text: '780.00');
+  final _taxPercentController = TextEditingController(text: '0');
+  final _discountController = TextEditingController(text: '0');
   late String _payerId;
   late Set<String> _splitMembers;
   bool _isSubmitting = false;
@@ -48,7 +50,19 @@ class _ShoppingCheckoutSheetState extends State<ShoppingCheckoutSheet> {
   @override
   void dispose() {
     _amountController.dispose();
+    _taxPercentController.dispose();
+    _discountController.dispose();
     super.dispose();
+  }
+
+  void _recalculateNetTotal() {
+    final rawBase = double.tryParse(_amountController.text) ?? 0.0;
+    final taxPct = double.tryParse(_taxPercentController.text) ?? 0.0;
+    final discount = double.tryParse(_discountController.text) ?? 0.0;
+    final net = (rawBase * (1.0 + (taxPct / 100.0))) - discount;
+    if (net >= 0) {
+      _amountController.text = net.toStringAsFixed(2);
+    }
   }
 
   Map<String, int> _getPreviewShares() {
@@ -208,6 +222,98 @@ class _ShoppingCheckoutSheetState extends State<ShoppingCheckoutSheet> {
               ),
               const SizedBox(height: 14),
             ],
+
+            // Tax & Discount (Surprise Task Feature)
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'TAX %',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.faint,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 42,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.canvas,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.line),
+                        ),
+                        child: TextField(
+                          controller: _taxPercentController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          onChanged: (_) {
+                            _recalculateNetTotal();
+                            setState(() {});
+                          },
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            suffixText: '%',
+                            suffixStyle: TextStyle(fontWeight: FontWeight.w700, color: AppColors.slate),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'DISCOUNT',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.faint,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 42,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.canvas,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.line),
+                        ),
+                        child: TextField(
+                          controller: _discountController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          onChanged: (_) {
+                            _recalculateNetTotal();
+                            setState(() {});
+                          },
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            prefixText: 'PKR ',
+                            prefixStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.slate),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
 
             // Total Paid Field (Highlighted Jade Container)
             const Text(

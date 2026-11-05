@@ -3,7 +3,7 @@
 > **Target Audience:** App Developer Agents, Mobile Engineers, Backend Integrators.  
 > **Backend Framework:** FastAPI (Python 3.12)  
 > **Client Framework:** Flutter (Dart 3.x), Bloc / Cubit, Dio 5.4.0, Flutter Secure Storage  
-> **Status:** Production-Ready & Verified Live (`129/129` Backend Tests Passed, `50/50` Flutter Tests Passed)
+> **Status:** Production-Ready & Verified Live (`134/134` Backend Tests Passed, `53/53` Flutter Tests Passed)
 
 ---
 
@@ -373,8 +373,9 @@ All state-modifying write endpoints accept an optional/recommended `Idempotency-
 ---
 
 ### 12. Get Member Balances
-- **Method / Path:** `GET /api/balances`
+- **Method / Path:** `GET /api/balances` or `GET /api/balances?member_id={id}`
 - **Auth:** `Authorization: Bearer <token>`
+- **Optional Query Param:** `member_id` (e.g. `M01` or database ID integer). When supplied, the backend validates household membership (returns 404 for cross-household IDOR attempts) and returns only that member in the `members` array.
 - **Contract Balance Status:** `"owed"` (`net_balance > 0`), `"owes"` (`net_balance < 0`), or `"settled"` (`0.00`).
 - **Response `200 OK`:**
   ```json
@@ -512,6 +513,24 @@ All state-modifying write endpoints accept an optional/recommended `Idempotency-
 
 ---
 
+### 16. Smart Settle Debt Simplification (Surprise Task)
+- **Method / Path:** `GET /api/balances/simplify`
+- **Auth:** `Authorization: Bearer <token>`
+- **Description:** Computes the minimal number of debt transfers required to balance the entire household ledger, eliminating circular debt.
+- **Response `200 OK`:**
+  ```json
+  [
+    {
+      "sender_id": "M02",
+      "recipient_id": "M01",
+      "amount": 250.0,
+      "amount_paisa": 25000
+    }
+  ]
+  ```
+
+---
+
 ## 4. End-to-End Live Verification Script
 
 Run the script below in terminal to verify all 15 endpoints in under 5 seconds:
@@ -587,3 +606,4 @@ shared_living_app/
 - Zero hardcoded demo chips or prefilled demo credentials in the UI.
 - Secure token storage via `flutter_secure_storage`.
 - Full unit and integration test coverage across all layers.
+

@@ -119,8 +119,9 @@ class BudgetService:
         target_code = None
         if member_id is not None:
             mem = MemberRepository.resolve_member(session, ctx.household_id, member_id)
-            if mem:
-                target_code = mem.code
+            if not mem:
+                raise NotFoundError(f"Member '{member_id}' not found in authorized household.")
+            target_code = mem.code
         elif ctx.member_code:
             target_code = ctx.member_code
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/hisab_logo.dart';
 import '../../../auth/domain/models/auth_user.dart';
 import '../../../dashboard/presentation/cubit/dashboard_cubit.dart';
@@ -154,31 +155,73 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             actions: [
               // Roommate Avatars Stack (Ali, Ayesha, Bilal)
               Padding(
-                padding: const EdgeInsets.only(right: 12.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _AvatarStackItem(
-                      initials: 'A',
-                      color: AppColors.avatarAli,
-                      isActive: activeMemberId == 'M01',
-                      onTap: () => context.read<DashboardCubit>().switchMember('M01'),
-                    ),
-                    const SizedBox(width: 4),
-                    _AvatarStackItem(
-                      initials: 'Ay',
-                      color: AppColors.avatarAyesha,
-                      isActive: activeMemberId == 'M02',
-                      onTap: () => context.read<DashboardCubit>().switchMember('M02'),
-                    ),
-                    const SizedBox(width: 4),
-                    _AvatarStackItem(
-                      initials: 'B',
-                      color: AppColors.avatarBilal,
-                      isActive: activeMemberId == 'M03',
-                      onTap: () => context.read<DashboardCubit>().switchMember('M03'),
-                    ),
-                  ],
+                padding: const EdgeInsets.only(right: 14.0),
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: AppColors.line),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.jade900.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _AvatarStackItem(
+                        initials: 'A',
+                        name: 'Ali',
+                        color: AppColors.avatarAli,
+                        isActive: activeMemberId == 'M01',
+                        onTap: () {
+                          context.read<DashboardCubit>().switchMember('M01');
+                          AppToast.showPerspectiveSwitch(
+                            context,
+                            memberName: 'Ali',
+                            initials: 'A',
+                            color: AppColors.avatarAli,
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 3),
+                      _AvatarStackItem(
+                        initials: 'Ay',
+                        name: 'Ayesha',
+                        color: AppColors.avatarAyesha,
+                        isActive: activeMemberId == 'M02',
+                        onTap: () {
+                          context.read<DashboardCubit>().switchMember('M02');
+                          AppToast.showPerspectiveSwitch(
+                            context,
+                            memberName: 'Ayesha',
+                            initials: 'Ay',
+                            color: AppColors.avatarAyesha,
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 3),
+                      _AvatarStackItem(
+                        initials: 'B',
+                        name: 'Bilal',
+                        color: AppColors.avatarBilal,
+                        isActive: activeMemberId == 'M03',
+                        onTap: () {
+                          context.read<DashboardCubit>().switchMember('M03');
+                          AppToast.showPerspectiveSwitch(
+                            context,
+                            memberName: 'Bilal',
+                            initials: 'B',
+                            color: AppColors.avatarBilal,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -188,6 +231,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             children: [
               // Tab 0: Home Dashboard
               HomeDashboardScreen(
+                authUser: widget.user,
                 onNavigateToShopping: () => _onTabSelected(1),
                 onNavigateToExpenses: () => _onTabSelected(2),
               ),
@@ -221,12 +265,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
 class _AvatarStackItem extends StatelessWidget {
   final String initials;
+  final String name;
   final Color color;
   final bool isActive;
   final VoidCallback onTap;
 
   const _AvatarStackItem({
     required this.initials,
+    required this.name,
     required this.color,
     required this.isActive,
     required this.onTap,
@@ -236,25 +282,38 @@ class _AvatarStackItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+        width: isActive ? 30 : 26,
+        height: isActive ? 30 : 26,
         decoration: BoxDecoration(
-          color: isActive ? color : AppColors.jade50,
+          color: isActive ? color : color.withValues(alpha: 0.18),
           shape: BoxShape.circle,
           border: Border.all(
-            color: isActive ? AppColors.jade500 : AppColors.line,
-            width: isActive ? 1.8 : 1,
+            color: isActive ? Colors.white : Colors.transparent,
+            width: isActive ? 2.0 : 0.0,
           ),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Center(
-          child: Text(
-            initials,
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
             style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              color: isActive ? Colors.white : AppColors.jade700,
+              fontSize: isActive ? 11 : 9.5,
+              fontWeight: FontWeight.w800,
+              color: isActive ? Colors.white : color,
             ),
+            child: Text(initials),
           ),
         ),
       ),

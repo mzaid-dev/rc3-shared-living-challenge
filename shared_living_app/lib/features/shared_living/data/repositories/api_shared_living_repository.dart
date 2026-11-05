@@ -216,3 +216,4 @@ class ApiSharedLivingRepository implements SharedLivingRepository {
     );
   }
 }
+

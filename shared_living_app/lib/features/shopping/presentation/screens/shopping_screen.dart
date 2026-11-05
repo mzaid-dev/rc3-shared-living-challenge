@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../../shared_living/data/models/member.dart';
 import '../cubit/shopping_cubit.dart';
@@ -76,28 +77,10 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
       listener: (context, state) {
         if (state is ShoppingLoaded) {
           if (state.actionSuccessMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: AppColors.jade600,
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  state.actionSuccessMessage!,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                ),
-              ),
-            );
+            AppToast.showSuccess(context, message: state.actionSuccessMessage!);
           }
           if (state.actionErrorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: AppColors.coral600,
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  state.actionErrorMessage!,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                ),
-              ),
-            );
+            AppToast.showError(context, message: state.actionErrorMessage!);
           }
         }
       },

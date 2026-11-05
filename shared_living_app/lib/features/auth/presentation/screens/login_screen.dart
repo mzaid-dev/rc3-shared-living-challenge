@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/hisab_logo.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -56,24 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: AppColors.coral600,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  content: Row(
-                    children: [
-                      const Icon(Icons.error_outline, color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          state.message,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              AppToast.showError(
+                context,
+                title: 'Authentication Error',
+                message: state.message,
               );
             }
           },

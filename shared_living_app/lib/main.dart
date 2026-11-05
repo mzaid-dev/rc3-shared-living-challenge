@@ -96,7 +96,12 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is Unauthenticated) {
+          context.read<DashboardCubit>().reset();
+        }
+      },
       builder: (context, state) {
         if (state is Authenticated) {
           return MainNavigationShell(user: state.user);

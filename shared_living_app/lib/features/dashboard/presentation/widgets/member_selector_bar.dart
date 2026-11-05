@@ -9,6 +9,7 @@ class MemberSelectorBar extends StatelessWidget {
   final String activeMemberId;
   final BalancesResponse balances;
   final ValueChanged<String> onMemberSelected;
+  final String? authenticatedMemberId;
 
   const MemberSelectorBar({
     super.key,
@@ -16,6 +17,7 @@ class MemberSelectorBar extends StatelessWidget {
     required this.activeMemberId,
     required this.balances,
     required this.onMemberSelected,
+    this.authenticatedMemberId,
   });
 
   Color _getMemberColor(String memberId) {
@@ -34,7 +36,7 @@ class MemberSelectorBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: const [
             Text(
-              'ROOMMATES',
+              'ROOMMATE PERSPECTIVES',
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
@@ -44,7 +46,7 @@ class MemberSelectorBar extends StatelessWidget {
             ),
             Text(
               'Tap to switch view',
-              style: TextStyle(fontSize: 10.5, color: AppColors.faint),
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w500, color: AppColors.faint),
             ),
           ],
         ),
@@ -52,6 +54,7 @@ class MemberSelectorBar extends StatelessWidget {
         Row(
           children: members.map((member) {
             final isSelected = member.id == activeMemberId;
+            final isAuthUser = authenticatedMemberId != null && member.id == authenticatedMemberId;
             final memberBalance = balances.balances.firstWhere(
               (b) => b.memberId == member.id,
               orElse: () => balances.balances.first,
@@ -111,10 +114,10 @@ class MemberSelectorBar extends StatelessWidget {
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              member.name,
+                              isAuthUser ? '${member.name} (You)' : member.name,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11.5,
                                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                 color: isSelected ? AppColors.ink : AppColors.slate,
                               ),

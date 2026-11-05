@@ -181,6 +181,16 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
     }
   }
 
+  bool get _isCategoryOver40Percent {
+    try {
+      final money = Money.parse(_amountController.text);
+      // 40% of PKR 5,000.00 household budget = 2,000.00 PKR (200,000 paisa)
+      return money.paisa >= 200000;
+    } catch (_) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final previewShares = _getPreviewShares();
@@ -365,6 +375,33 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                 }).toList(),
               ),
             ),
+            if (_isCategoryOver40Percent) ...[
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.amber50,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.amber500.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: AppColors.amber700, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Category Warning: This expense exceeds 40% (PKR 2,000) of the monthly budget.',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.amber700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
 
             // Paid By & Split Type row
