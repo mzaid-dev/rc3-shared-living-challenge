@@ -231,3 +231,62 @@ class AuditLog(Base):
         Index("ix_audit_logs_household_created", "household_id", "created_at"),
     )
 
+# 13. Assistant Conversations Table
+class AssistantConversation(Base):
+    __tablename__ = "assistant_conversations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=generate_uuid)
+    authenticated_user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    household_id: Mapped[str] = mapped_column(String(36), ForeignKey("households.id", ondelete="CASCADE"), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), default="Chat", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    messages: Mapped[list["AssistantMessage"]] = relationship("AssistantMessage", back_populates="conversation", cascade="all, delete-orphan", order_by="AssistantMessage.created_at")
+    pending_actions: Mapped[list["AssistantPendingAction"]] = relationship("AssistantPendingAction", back_populates="conversation", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        Index("ix_assistant_conv_user_household", "authenticated_user_id", "household_id"),
+    )
+
+# 14. Assistant Messages Table
+class AssistantMessage(Base):
+    __tablename__ = "assistant_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("assistant_conversations.id", ondelete="CASCADE"), nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)  # 'user', 'assistant', 'system'
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    metadata_json: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    conversation: Mapped["AssistantConversation"] = relationship("AssistantConversation", back_populates="messages")
+
+    __table_args__ = (
+        Index("ix_assistant_msg_conv", "conversation_id", "created_at"),
+    )
+
+# 15. Assistant Pending Actions Table
+class AssistantPendingAction(Base):
+    __tablename__ = "assistant_pending_actions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=generate_uuid)
+    conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("assistant_conversations.id", ondelete="CASCADE"), nullable=False)
+    authenticated_user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    household_id: Mapped[str] = mapped_column(String(36), ForeignKey("households.id", ondelete="CASCADE"), nullable=False)
+    action_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'create_expense', 'add_shopping_item', 'shopping_checkout', 'settle_debt'
+    validated_payload: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)  # 'pending', 'confirmed', 'rejected', 'expired'
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    executed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    conversation: Mapped["AssistantConversation"] = relationship("AssistantConversation", back_populates="pending_actions")
+
+    __table_args__ = (
+        Index("ix_assistant_pending_user_household", "authenticated_user_id", "household_id"),
+        Index("ix_assistant_pending_status", "status"),
+    )
+
+

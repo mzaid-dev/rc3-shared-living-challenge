@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List, Literal, Optional
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -29,6 +29,24 @@ class Settings(BaseSettings):
     RATE_LIMIT_DEFAULT: str = "100/minute"
     MAX_REQUEST_BODY_BYTES: int = 65536
     DOCS_ENABLED: bool = False
+
+    # AI Assistant Configuration
+    AI_PROVIDER: str = "groq"  # "groq", "deepseek", "grok", "gemini", "openai", "mock"
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
+    GROQ_MODEL: str = "openai/gpt-oss-120b"
+    DEEPSEEK_API_KEY: Optional[str] = None
+    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
+    DEEPSEEK_MODEL: str = "deepseek-chat"
+    GROK_API_KEY: Optional[str] = None
+    GROK_BASE_URL: str = "https://api.x.ai/v1"
+    GROK_MODEL: str = "grok-beta"
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    AI_TIMEOUT_SECONDS: int = 15
+    AI_ACTION_EXPIRY_MINUTES: int = 10
 
     @model_validator(mode="after")
     def validate_production_guards(self) -> "Settings":

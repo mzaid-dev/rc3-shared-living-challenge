@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../auth/domain/models/auth_user.dart';
+import '../../../shared_living/data/models/member.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
 import '../widgets/hero_financial_carousel.dart';
 import '../widgets/member_selector_bar.dart';
 import '../widgets/quick_stats_row.dart';
 import '../widgets/recent_expenses_card.dart';
+import '../widgets/switch_perspective_dialog.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
   final VoidCallback onNavigateToShopping;
@@ -21,6 +24,55 @@ class HomeDashboardScreen extends StatelessWidget {
     required this.onNavigateToExpenses,
     this.authUser,
   });
+
+  void _promptSwitchPerspective(
+    BuildContext context,
+    String targetMemberId,
+    DashboardLoaded state,
+  ) {
+    if (state.activeMemberId == targetMemberId) return;
+
+    final targetMember = state.members.firstWhere(
+      (m) => m.id == targetMemberId,
+      orElse: () => Member(id: targetMemberId, name: targetMemberId),
+    );
+
+    final targetBalance = state.balances.balances.firstWhere(
+      (b) => b.memberId == targetMemberId,
+      orElse: () => state.balances.balances.first,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalCtx) => SwitchPerspectiveDialog(
+        targetMember: targetMember,
+        targetBalance: targetBalance,
+        onConfirm: () {
+          context.read<DashboardCubit>().switchMember(targetMemberId);
+          Color color = AppColors.jade600;
+          String initials = targetMember.name[0];
+          if (targetMemberId == 'M01') {
+            color = AppColors.avatarAli;
+            initials = 'A';
+          } else if (targetMemberId == 'M02') {
+            color = AppColors.avatarAyesha;
+            initials = 'Ay';
+          } else if (targetMemberId == 'M03') {
+            color = AppColors.avatarBilal;
+            initials = 'B';
+          }
+          AppToast.showTopPerspectiveSwitch(
+            context,
+            memberName: targetMember.name,
+            initials: initials,
+            color: color,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +114,7 @@ class HomeDashboardScreen extends StatelessWidget {
           final greetingName = effectiveAuthUser?.name.isNotEmpty == true
               ? effectiveAuthUser!.name
               : state.dashboardData.member.name;
-          final isViewingSelf = effectiveAuthUser != null && effectiveAuthUser.id == state.activeMemberId;
-          final perspectiveSubtitle = isViewingSelf
-              ? 'Personal balance · Lahore Apartment'
-              : 'Viewing ${state.dashboardData.member.name}\'s ledger perspective';
+          final isViewingOther = effectiveAuthUser != null && effectiveAuthUser.id != state.activeMemberId;
 
           return RefreshIndicator(
             color: AppColors.jade600,
@@ -77,7 +126,7 @@ class HomeDashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 1. Warm Greeting & Apartment Location
+                  // 1. Warm Greeting & Apartment Location / Perspective Indicator
                   Padding(
                     padding: const EdgeInsets.only(left: 2.0, bottom: 16),
                     child: Column(
@@ -92,41 +141,52 @@ class HomeDashboardScreen extends StatelessWidget {
                             color: AppColors.ink,
                           ),
                         ),
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            if (!isViewingSelf) ...[
+                        if (isViewingOther) ...[
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                margin: const EdgeInsets.only(right: 6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.jade600.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(6),
+                                  color: AppColors.jade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppColors.jade200),
                                 ),
                                 child: const Text(
                                   'VIEWING PERSPECTIVE',
                                   style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.4,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
                                     color: AppColors.jade700,
                                   ),
                                 ),
                               ),
-                            ],
-                            Flexible(
-                              child: Text(
-                                perspectiveSubtitle,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.slate,
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  'Viewing ${state.dashboardData.member.name}\'s ledger perspective',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.slate,
+                                  ),
                                 ),
                               ),
+                            ],
+                          ),
+                        ] else ...[
+                          const SizedBox(height: 3),
+                          const Text(
+                            'Gulberg apartment · November 2026',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.slate,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -154,10 +214,8 @@ class HomeDashboardScreen extends StatelessWidget {
                     members: state.members,
                     activeMemberId: state.activeMemberId,
                     balances: state.balances,
-                    authenticatedMemberId: effectiveAuthUser?.id,
-                    onMemberSelected: (id) {
-                      context.read<DashboardCubit>().switchMember(id);
-                    },
+                    authenticatedMemberId: authUser?.id,
+                    onMemberSelected: (id) => _promptSwitchPerspective(context, id, state),
                   ),
                   const SizedBox(height: 18),
 

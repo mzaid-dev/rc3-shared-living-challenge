@@ -4,20 +4,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../auth/domain/models/auth_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../../../shared_living/data/repositories/mock_shared_living_repository.dart';
-import '../../../shared_living/domain/repositories/shared_living_repository.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   final AuthUser user;
 
   const SettingsScreen({super.key, required this.user});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _simulateOffline = false;
 
   Color _getMemberColor(String memberId) {
     if (memberId == 'M01') return AppColors.avatarAli;
@@ -33,8 +24,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final initials = _getMemberInitials(widget.user.name);
-    final avatarColor = _getMemberColor(widget.user.id);
+    final initials = _getMemberInitials(user.name);
+    final avatarColor = _getMemberColor(user.id);
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
@@ -106,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Flexible(
                             child: Text(
-                              widget.user.name,
+                              user.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -125,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               border: Border.all(color: AppColors.jade100),
                             ),
                             child: Text(
-                              widget.user.id,
+                              user.id,
                               style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
@@ -137,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        widget.user.email,
+                        user.email,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 12, color: AppColors.slate),
@@ -190,82 +181,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
-
-          // 3. Diagnostics & Mock Network Controls
-          const Text(
-            'NETWORK & DIAGNOSTICS',
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
-              color: AppColors.faint,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: AppRadius.radiusCard,
-              border: Border.all(color: AppColors.line),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: _simulateOffline ? AppColors.coral50 : AppColors.jade50,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      _simulateOffline ? Icons.wifi_off_rounded : Icons.wifi_rounded,
-                      size: 18,
-                      color: _simulateOffline ? AppColors.coral600 : AppColors.jade600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Simulate Offline Network',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.ink),
-                      ),
-                      SizedBox(height: 1),
-                      Text(
-                        'Throws NetworkFailure on repository calls',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, color: AppColors.faint),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Switch(
-                  value: _simulateOffline,
-                  activeThumbColor: AppColors.coral600,
-                  onChanged: (val) {
-                    setState(() => _simulateOffline = val);
-                    final repo = context.read<SharedLivingRepository>();
-                    if (repo is MockSharedLivingRepository) {
-                      repo.simulateNetworkFailure = val;
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 24),
 
-          // 4. Sign Out Button
+          // 3. Sign Out Button
           OutlinedButton.icon(
             onPressed: () => context.read<AuthCubit>().logout(),
             icon: const Icon(Icons.logout_rounded, size: 18, color: AppColors.coral600),

@@ -8,6 +8,7 @@ import '../../../auth/domain/models/auth_user.dart';
 import '../../../dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../../dashboard/presentation/cubit/dashboard_state.dart';
 import '../../../dashboard/presentation/screens/home_dashboard_screen.dart';
+import '../../../dashboard/presentation/widgets/switch_perspective_dialog.dart';
 import '../../../expenses/presentation/cubit/expenses_cubit.dart';
 import '../../../expenses/presentation/cubit/expenses_state.dart';
 import '../../../expenses/presentation/screens/expenses_and_settle_screen.dart';
@@ -44,6 +45,56 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   void _onTabSelected(int index) {
     setState(() => _currentIndex = index);
+  }
+
+  void _promptSwitchPerspective(
+    BuildContext context,
+    String targetMemberId,
+    DashboardState dashState,
+  ) {
+    if (dashState is! DashboardLoaded) return;
+    if (dashState.activeMemberId == targetMemberId) return;
+
+    final targetMember = dashState.members.firstWhere(
+      (m) => m.id == targetMemberId,
+      orElse: () => Member(id: targetMemberId, name: targetMemberId),
+    );
+
+    final targetBalance = dashState.balances.balances.firstWhere(
+      (b) => b.memberId == targetMemberId,
+      orElse: () => dashState.balances.balances.first,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalCtx) => SwitchPerspectiveDialog(
+        targetMember: targetMember,
+        targetBalance: targetBalance,
+        onConfirm: () {
+          context.read<DashboardCubit>().switchMember(targetMemberId);
+          Color color = AppColors.jade600;
+          String initials = targetMember.name[0];
+          if (targetMemberId == 'M01') {
+            color = AppColors.avatarAli;
+            initials = 'A';
+          } else if (targetMemberId == 'M02') {
+            color = AppColors.avatarAyesha;
+            initials = 'Ay';
+          } else if (targetMemberId == 'M03') {
+            color = AppColors.avatarBilal;
+            initials = 'B';
+          }
+          AppToast.showTopPerspectiveSwitch(
+            context,
+            memberName: targetMember.name,
+            initials: initials,
+            color: color,
+          );
+        },
+      ),
+    );
   }
 
   void _openQuickActionSheet(BuildContext context, String activeMemberId, List<Member> members) {
@@ -178,15 +229,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         name: 'Ali',
                         color: AppColors.avatarAli,
                         isActive: activeMemberId == 'M01',
-                        onTap: () {
-                          context.read<DashboardCubit>().switchMember('M01');
-                          AppToast.showPerspectiveSwitch(
-                            context,
-                            memberName: 'Ali',
-                            initials: 'A',
-                            color: AppColors.avatarAli,
-                          );
-                        },
+                        onTap: () => _promptSwitchPerspective(context, 'M01', dashState),
                       ),
                       const SizedBox(width: 3),
                       _AvatarStackItem(
@@ -194,15 +237,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         name: 'Ayesha',
                         color: AppColors.avatarAyesha,
                         isActive: activeMemberId == 'M02',
-                        onTap: () {
-                          context.read<DashboardCubit>().switchMember('M02');
-                          AppToast.showPerspectiveSwitch(
-                            context,
-                            memberName: 'Ayesha',
-                            initials: 'Ay',
-                            color: AppColors.avatarAyesha,
-                          );
-                        },
+                        onTap: () => _promptSwitchPerspective(context, 'M02', dashState),
                       ),
                       const SizedBox(width: 3),
                       _AvatarStackItem(
@@ -210,15 +245,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         name: 'Bilal',
                         color: AppColors.avatarBilal,
                         isActive: activeMemberId == 'M03',
-                        onTap: () {
-                          context.read<DashboardCubit>().switchMember('M03');
-                          AppToast.showPerspectiveSwitch(
-                            context,
-                            memberName: 'Bilal',
-                            initials: 'B',
-                            color: AppColors.avatarBilal,
-                          );
-                        },
+                        onTap: () => _promptSwitchPerspective(context, 'M03', dashState),
                       ),
                     ],
                   ),

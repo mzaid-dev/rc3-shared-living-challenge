@@ -24,6 +24,7 @@ from app.db.seed import seed_demo_data
 from app.db.session import SessionLocal, engine
 from app.domain.exceptions import DomainError
 from app.routers import (
+    assistant,
     audit,
     auth,
     balances,
@@ -267,6 +268,7 @@ app.include_router(settle.router)
 app.include_router(budget.router)
 app.include_router(dashboard.router)
 app.include_router(audit.router)
+app.include_router(assistant.router)
 
 # Foundation Endpoints
 @app.get("/", tags=["Root"])

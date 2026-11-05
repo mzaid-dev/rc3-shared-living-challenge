@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/network/auth_interceptor.dart';
 import 'core/network/dio_client.dart';
 import 'core/theme/app_theme.dart';
+import 'features/assistant/data/repositories/api_assistant_repository.dart';
+import 'features/assistant/domain/repositories/assistant_repository.dart';
+import 'features/assistant/presentation/cubit/assistant_cubit.dart';
 import 'features/auth/data/api_auth_repository.dart';
 import 'features/auth/data/token_storage.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
@@ -42,28 +45,39 @@ void main() async {
     dio: mainDio,
   );
 
+  final assistantRepository = ApiAssistantRepository(
+    dio: mainDio,
+  );
+
   runApp(MyApp(
     authRepository: authRepository,
     sharedLivingRepository: sharedLivingRepository,
+    assistantRepository: assistantRepository,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepository authRepository;
   final SharedLivingRepository sharedLivingRepository;
+  final AssistantRepository? assistantRepository;
 
   const MyApp({
     super.key,
     required this.authRepository,
     required this.sharedLivingRepository,
+    this.assistantRepository,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAssistantRepo = assistantRepository ??
+        ApiAssistantRepository(dio: DioClientConfig.createDio());
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>.value(value: authRepository),
         RepositoryProvider<SharedLivingRepository>.value(value: sharedLivingRepository),
+        RepositoryProvider<AssistantRepository>.value(value: effectiveAssistantRepo),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -78,6 +92,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<ExpensesCubit>(
             create: (context) => ExpensesCubit(repository: sharedLivingRepository),
+          ),
+          BlocProvider<AssistantCubit>(
+            create: (context) => AssistantCubit(repository: effectiveAssistantRepo),
           ),
         ],
         child: MaterialApp(
