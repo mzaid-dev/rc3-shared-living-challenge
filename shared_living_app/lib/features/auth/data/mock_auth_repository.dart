@@ -44,6 +44,18 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthTokens> register(String name, String email, String password) async {
+    final cleanEmail = email.trim().toLowerCase();
+    final newId = 'M0${_demoUsers.length + 1}';
+    final user = AuthUser(id: newId, name: name.trim(), email: cleanEmail);
+    _demoUsers[cleanEmail] = user;
+    final tokens = _generateTokens(newId);
+    await tokenStorage.saveTokens(tokens);
+    await tokenStorage.saveUser(user);
+    return tokens;
+  }
+
+  @override
   Future<AuthTokens> refresh(String refreshToken) async {
     // Check if refresh token was already consumed -> REFRESH_REUSED
     if (_consumedRefreshTokens.contains(refreshToken)) {

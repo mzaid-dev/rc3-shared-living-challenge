@@ -50,21 +50,22 @@ class BudgetProgressCard extends StatelessWidget {
     final remainingFormatted = _formatPkr(dashboardData.remaining);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: AppRadius.radiusCard,
         border: Border.all(color: AppColors.line),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade900.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
+            color: const Color(0x0A000000),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Top Row: Month Label & Warning Badge
           Row(
@@ -73,13 +74,13 @@ class BudgetProgressCard extends StatelessWidget {
               Text(
                 '${dashboardData.month} budget',
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.slate,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: badgeBg,
                   borderRadius: AppRadius.radiusTag,
@@ -90,7 +91,7 @@ class BudgetProgressCard extends StatelessWidget {
                 child: Text(
                   badgeText,
                   style: TextStyle(
-                    fontSize: 10.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.2,
                     color: badgeFg,
@@ -99,7 +100,6 @@ class BudgetProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
 
           // Middle Row: Spent Amount & Limit
           Row(
@@ -108,20 +108,23 @@ class BudgetProgressCard extends StatelessWidget {
             children: [
               Text(
                 spentFormatted,
-                style: AppTypography.displayLarge.copyWith(fontSize: 26),
+                style: AppTypography.displayLarge.copyWith(fontSize: 27),
               ),
               const SizedBox(width: 8),
-              Text(
-                'of $limitFormatted',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.faint,
+              Expanded(
+                child: Text(
+                  'of $limitFormatted',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.faint,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
 
           // Custom Progress Track
           Stack(
@@ -147,7 +150,6 @@ class BudgetProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
 
           // Bottom Row: Remaining amount & Bill count
           Row(
@@ -156,7 +158,7 @@ class BudgetProgressCard extends StatelessWidget {
               Text(
                 '$remainingFormatted remaining',
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.amber700,
                 ),
@@ -164,7 +166,7 @@ class BudgetProgressCard extends StatelessWidget {
               const Text(
                 '4 shared bills',
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.faint,
                 ),

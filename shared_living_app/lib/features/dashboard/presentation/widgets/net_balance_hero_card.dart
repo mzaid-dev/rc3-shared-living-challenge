@@ -24,7 +24,7 @@ class NetBalanceHeroCard extends StatelessWidget {
     final isPositive = netPaisa > 0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -35,11 +35,15 @@ class NetBalanceHeroCard extends StatelessWidget {
           ],
         ),
         borderRadius: AppRadius.radiusCard,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.jade700.withValues(alpha: 0.3),
-            blurRadius: 26,
-            offset: const Offset(0, 10),
+            color: AppColors.jade900.withValues(alpha: 0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -50,31 +54,32 @@ class NetBalanceHeroCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'YOUR NET BALANCE',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
                     color: Color(0xBFFFFFFF), // 75% white
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   isPositive
                       ? '+${Money.fromPaisa(netPaisa).format()}'
                       : Money.fromPaisa(netPaisa).format(),
                   style: AppTypography.currencyHero.copyWith(
                     color: Colors.white,
-                    fontSize: 27,
+                    fontSize: 29,
                   ),
                 ),
-                const SizedBox(height: 3),
                 Text(
                   memberSummary.message,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: Color(0xD9FFFFFF), // 85% white
                   ),
@@ -82,12 +87,13 @@ class NetBalanceHeroCard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 14),
           // Fast Action Icon Button
           GestureDetector(
             onTap: onQuickSettleTapped,
             child: Container(
-              width: 46,
-              height: 46,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(16),
@@ -96,7 +102,7 @@ class NetBalanceHeroCard extends StatelessWidget {
                 child: Icon(
                   Icons.arrow_outward_rounded,
                   color: Colors.white,
-                  size: 22,
+                  size: 24,
                 ),
               ),
             ),

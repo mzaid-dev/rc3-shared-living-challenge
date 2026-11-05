@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/network/auth_interceptor.dart';
+import 'core/network/dio_client.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/data/mock_auth_repository.dart';
+import 'features/auth/data/api_auth_repository.dart';
 import 'features/auth/data/token_storage.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
@@ -11,7 +13,7 @@ import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'features/expenses/presentation/cubit/expenses_cubit.dart';
 import 'features/navigation/presentation/screens/main_navigation_shell.dart';
-import 'features/shared_living/data/repositories/mock_shared_living_repository.dart';
+import 'features/shared_living/data/repositories/api_shared_living_repository.dart';
 import 'features/shared_living/domain/repositories/shared_living_repository.dart';
 import 'features/shopping/presentation/cubit/shopping_cubit.dart';
 
@@ -19,8 +21,26 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final tokenStorage = TokenStorage();
-  final authRepository = MockAuthRepository(tokenStorage: tokenStorage);
-  final sharedLivingRepository = MockSharedLivingRepository();
+  final mainDio = DioClientConfig.createDio();
+  final refreshDio = DioClientConfig.createRefreshDio();
+
+  // Attach mutex AuthInterceptor for Bearer injection & concurrent 401 token rotation
+  final authInterceptor = AuthInterceptor(
+    tokenStorage: tokenStorage,
+    refreshDio: refreshDio,
+    mainDio: mainDio,
+  );
+  mainDio.interceptors.add(authInterceptor);
+
+  final authRepository = ApiAuthRepository(
+    dio: mainDio,
+    refreshDio: refreshDio,
+    tokenStorage: tokenStorage,
+  );
+
+  final sharedLivingRepository = ApiSharedLivingRepository(
+    dio: mainDio,
+  );
 
   runApp(MyApp(
     authRepository: authRepository,

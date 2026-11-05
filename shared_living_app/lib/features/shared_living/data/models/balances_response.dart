@@ -24,16 +24,48 @@ class MemberBalance extends Equatable {
   });
 
   factory MemberBalance.fromJson(Map<String, dynamic> json) {
+    final rawPaid = json['total_paid'] ?? json['paid'];
+    final paidStr = (rawPaid is num)
+        ? rawPaid.toStringAsFixed(2)
+        : (rawPaid?.toString() ?? '0.00');
+
+    final rawOwed = json['share_owed'] ?? json['owed'];
+    final owedStr = (rawOwed is num)
+        ? rawOwed.toStringAsFixed(2)
+        : (rawOwed?.toString() ?? '0.00');
+
+    final rawRecv = json['settlements_received'] ?? '0.00';
+    final recvStr = (rawRecv is num)
+        ? rawRecv.toStringAsFixed(2)
+        : (rawRecv?.toString() ?? '0.00');
+
+    final rawSent = json['settlements_sent'] ?? '0.00';
+    final sentStr = (rawSent is num)
+        ? rawSent.toStringAsFixed(2)
+        : (rawSent?.toString() ?? '0.00');
+
+    final rawNet = json['net_balance'];
+    final netStr = (rawNet is num)
+        ? (rawNet > 0 ? '+${rawNet.toStringAsFixed(2)}' : rawNet.toStringAsFixed(2))
+        : (rawNet?.toString() ?? '0.00');
+
+    final rawNetPaisa = json['net_balance_paisa'];
+    final netPaisa = (rawNetPaisa is num)
+        ? rawNetPaisa.toInt()
+        : (double.tryParse(netStr.replaceAll('+', '')) != null
+            ? (double.parse(netStr.replaceAll('+', '')) * 100).round()
+            : 0);
+
     return MemberBalance(
-      memberId: json['member_id'] as String,
-      name: json['name'] as String,
-      totalPaid: json['total_paid'] as String,
-      shareOwed: json['share_owed'] as String,
-      settlementsReceived: json['settlements_received'] as String? ?? '0.00',
-      settlementsSent: json['settlements_sent'] as String? ?? '0.00',
-      netBalance: json['net_balance'] as String,
-      netBalancePaisa: json['net_balance_paisa'] as int,
-      status: json['status'] as String,
+      memberId: (json['member_id'] ?? json['memberId'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      totalPaid: paidStr,
+      shareOwed: owedStr,
+      settlementsReceived: recvStr,
+      settlementsSent: sentStr,
+      netBalance: netStr,
+      netBalancePaisa: netPaisa,
+      status: (json['status'] ?? 'settled').toString(),
     );
   }
 
@@ -75,12 +107,15 @@ class BalancesResponse extends Equatable {
   });
 
   factory BalancesResponse.fromJson(Map<String, dynamic> json) {
+    final list = (json['balances'] ?? json['members'] ?? []) as List<dynamic>;
+    final sumPaisa = json['sum_paisa'];
+    final sumStr = json['sum']?.toString() ?? '0.00';
     return BalancesResponse(
-      balances: (json['balances'] as List<dynamic>)
+      balances: list
           .map((e) => MemberBalance.fromJson(e as Map<String, dynamic>))
           .toList(),
-      sum: json['sum'] as String,
-      sumPaisa: json['sum_paisa'] as int,
+      sum: sumStr,
+      sumPaisa: sumPaisa is num ? sumPaisa.toInt() : 0,
     );
   }
 

@@ -5,7 +5,7 @@ import 'package:shared_living_app/features/shared_living/data/repositories/mock_
 import 'package:shared_living_app/main.dart';
 
 void main() {
-  testWidgets('App renders LoginScreen with demo roommate chips on start', (WidgetTester tester) async {
+  testWidgets('App renders LoginScreen with professional auth UI on start', (WidgetTester tester) async {
     final tokenStorage = TokenStorage(inMemoryOnly: true);
     final authRepository = MockAuthRepository(tokenStorage: tokenStorage);
     final sharedLivingRepository = MockSharedLivingRepository(latency: Duration.zero);
@@ -21,9 +21,10 @@ void main() {
     await tester.pump();
 
     expect(find.text('Shared living, settled smoothly.'), findsOneWidget);
-    expect(find.text('Ali'), findsOneWidget);
-    expect(find.text('Ayesha'), findsOneWidget);
-    expect(find.text('Bilal'), findsOneWidget);
-    expect(find.text('Sign in to Hisab'), findsOneWidget);
+    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.text('Create Account'), findsOneWidget);
+    expect(find.text('EMAIL ADDRESS'), findsOneWidget);
+    expect(find.text('PASSWORD'), findsOneWidget);
+    expect(find.text('Sign In to Hisab'), findsOneWidget);
   });
 }

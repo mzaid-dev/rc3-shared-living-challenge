@@ -17,10 +17,10 @@ class ShoppingItem extends Equatable {
 
   factory ShoppingItem.fromJson(Map<String, dynamic> json) {
     return ShoppingItem(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       title: json['title'] as String,
       unit: json['unit'] as String,
-      requestedQty: json['requested_qty'] as int,
+      requestedQty: (json['requested_qty'] as num).toInt(),
       status: json['status'] as String,
     );
   }

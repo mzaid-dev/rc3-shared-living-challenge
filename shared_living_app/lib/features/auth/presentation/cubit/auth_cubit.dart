@@ -42,6 +42,26 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> register(String name, String email, String password) async {
+    emit(const AuthLoading());
+    try {
+      await authRepository.register(name, email, password);
+      final user = await authRepository.me();
+      if (user != null) {
+        emit(Authenticated(user: user));
+      } else {
+        emit(const AuthError(
+          code: 'AUTH_FAILED',
+          message: 'Unable to retrieve profile after registration.',
+        ));
+      }
+    } on AppFailure catch (f) {
+      emit(AuthError(code: f.code, message: f.message));
+    } catch (e) {
+      emit(AuthError(code: 'REGISTER_ERROR', message: e.toString()));
+    }
+  }
+
   Future<void> logout() async {
     emit(const AuthLoading());
     try {

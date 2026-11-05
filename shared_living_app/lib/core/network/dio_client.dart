@@ -1,13 +1,26 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dio/dio.dart';
 
 class DioClientConfig {
-  static const String defaultBaseUrl = 'http://10.0.2.2:8000';
+  static String get defaultBaseUrl {
+    if (kIsWeb) {
+      return 'http://127.0.0.1:8000';
+    }
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:8000';
+      }
+    } catch (_) {}
+    return 'http://127.0.0.1:8000';
+  }
 
   static String get baseUrl {
-    return const String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: defaultBaseUrl,
-    );
+    const envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
+    return defaultBaseUrl;
   }
 
   static BaseOptions createOptions({String? customBaseUrl}) {

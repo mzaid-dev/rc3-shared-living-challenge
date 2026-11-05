@@ -13,10 +13,22 @@ class ExpenseSplitShare extends Equatable {
   });
 
   factory ExpenseSplitShare.fromJson(Map<String, dynamic> json) {
+    final rawShare = json['share'] ?? json['amount'];
+    final shareStr = (rawShare is num)
+        ? rawShare.toStringAsFixed(2)
+        : (rawShare?.toString() ?? '0.00');
+
+    final rawPaisa = json['share_paisa'] ?? json['amount_paisa'];
+    final paisa = (rawPaisa is num)
+        ? rawPaisa.toInt()
+        : (double.tryParse(shareStr) != null
+            ? (double.parse(shareStr) * 100).round()
+            : 0);
+
     return ExpenseSplitShare(
-      memberId: json['member_id'] as String,
-      share: json['share'] as String,
-      sharePaisa: json['share_paisa'] as int,
+      memberId: (json['member_id'] ?? json['memberId'] ?? '').toString(),
+      share: shareStr,
+      sharePaisa: paisa,
     );
   }
 
@@ -58,15 +70,29 @@ class Expense extends Equatable {
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) {
+    final rawAmount = json['amount'];
+    final amountStr = (rawAmount is num)
+        ? rawAmount.toStringAsFixed(2)
+        : (rawAmount?.toString() ?? '0.00');
+
+    final rawPaisa = json['amount_paisa'];
+    final paisa = (rawPaisa is num)
+        ? rawPaisa.toInt()
+        : (double.tryParse(amountStr) != null
+            ? (double.parse(amountStr) * 100).round()
+            : 0);
+
+    final rawDate = json['expense_date'] ?? json['date'] ?? '';
+
     return Expense(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       title: json['title'] as String,
-      category: json['category'] as String,
-      amount: json['amount'] as String,
-      amountPaisa: json['amount_paisa'] as int,
-      payerId: json['payer_id'] as String,
+      category: (json['category'] ?? 'General') as String,
+      amount: amountStr,
+      amountPaisa: paisa,
+      payerId: (json['payer_id'] ?? json['payerId'] ?? '').toString(),
       splitType: json['split_type'] as String,
-      date: json['date'] as String,
+      date: rawDate.toString(),
       source: json['source'] as String? ?? 'manual',
       splits: (json['splits'] as List<dynamic>?)
               ?.map((e) => ExpenseSplitShare.fromJson(e as Map<String, dynamic>))
@@ -161,16 +187,16 @@ class CreateExpenseDto extends Equatable {
       'split_type': splitType,
     };
     if (splitType == 'equal') {
-      if (equalMemberIds != null) {
-        map['splits'] = equalMemberIds;
+      if (equalMemberIds != null && equalMemberIds!.isNotEmpty) {
+        map['split_members'] = equalMemberIds;
       }
     } else {
-      if (customSplits != null) {
-        map['splits'] = customSplits!.map((s) => s.toJson()).toList();
+      if (customSplits != null && customSplits!.isNotEmpty) {
+        map['custom_splits'] = customSplits!.map((s) => s.toJson()).toList();
       }
     }
-    if (date != null) {
-      map['date'] = date;
+    if (date != null && date!.isNotEmpty) {
+      map['expense_date'] = date;
     }
     return map;
   }

@@ -24,16 +24,31 @@ class BudgetSummary extends Equatable {
   });
 
   factory BudgetSummary.fromJson(Map<String, dynamic> json) {
+    final rawSpent = json['spent'];
+    final spentStr = (rawSpent is num)
+        ? rawSpent.toStringAsFixed(2)
+        : (rawSpent?.toString() ?? '0.00');
+
+    final rawLimit = json['limit'];
+    final limitStr = (rawLimit is num)
+        ? rawLimit.toStringAsFixed(2)
+        : (rawLimit?.toString() ?? '0.00');
+
+    final rawRem = json['remaining'];
+    final remStr = (rawRem is num)
+        ? rawRem.toStringAsFixed(2)
+        : (rawRem?.toString() ?? '0.00');
+
     return BudgetSummary(
-      month: json['month'] as String,
-      spent: json['spent'] as String,
-      spentPaisa: json['spent_paisa'] as int,
-      limit: json['limit'] as String,
-      limitPaisa: json['limit_paisa'] as int,
-      remaining: json['remaining'] as String,
-      remainingPaisa: json['remaining_paisa'] as int,
-      percent: (json['percent'] as num).toInt(),
-      status: json['status'] as String,
+      month: (json['month'] ?? '').toString(),
+      spent: spentStr,
+      spentPaisa: (json['spent_paisa'] as num?)?.toInt() ?? 0,
+      limit: limitStr,
+      limitPaisa: (json['limit_paisa'] as num?)?.toInt() ?? 0,
+      remaining: remStr,
+      remainingPaisa: (json['remaining_paisa'] as num?)?.toInt() ?? 0,
+      percent: (json['percent'] as num?)?.toInt() ?? 0,
+      status: (json['status'] ?? 'on_track').toString(),
     );
   }
 
@@ -78,10 +93,10 @@ class DashboardMemberSummary extends Equatable {
 
   factory DashboardMemberSummary.fromJson(Map<String, dynamic> json) {
     return DashboardMemberSummary(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      netBalancePaisa: json['net_balance_paisa'] as int,
-      message: json['message'] as String,
+      id: (json['id'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      netBalancePaisa: (json['net_balance_paisa'] as num?)?.toInt() ?? 0,
+      message: (json['message'] ?? '').toString(),
     );
   }
 
@@ -124,18 +139,33 @@ class DashboardResponse extends Equatable {
   });
 
   factory DashboardResponse.fromJson(Map<String, dynamic> json) {
+    final rawSpent = json['spent'];
+    final spentStr = (rawSpent is num)
+        ? rawSpent.toStringAsFixed(2)
+        : (rawSpent?.toString() ?? '0.00');
+
+    final rawLimit = json['limit'];
+    final limitStr = (rawLimit is num)
+        ? rawLimit.toStringAsFixed(2)
+        : (rawLimit?.toString() ?? '0.00');
+
+    final rawRem = json['remaining'];
+    final remStr = (rawRem is num)
+        ? rawRem.toStringAsFixed(2)
+        : (rawRem?.toString() ?? '0.00');
+
     return DashboardResponse(
-      month: json['month'] as String,
-      spent: json['spent'] as String,
-      spentPaisa: json['spent_paisa'] as int,
-      limit: json['limit'] as String,
-      limitPaisa: json['limit_paisa'] as int,
-      remaining: json['remaining'] as String,
-      remainingPaisa: json['remaining_paisa'] as int,
-      percent: (json['percent'] as num).toInt(),
-      status: json['status'] as String,
+      month: (json['month'] ?? '').toString(),
+      spent: spentStr,
+      spentPaisa: (json['spent_paisa'] as num?)?.toInt() ?? 0,
+      limit: limitStr,
+      limitPaisa: (json['limit_paisa'] as num?)?.toInt() ?? 0,
+      remaining: remStr,
+      remainingPaisa: (json['remaining_paisa'] as num?)?.toInt() ?? 0,
+      percent: (json['percent'] as num?)?.toInt() ?? 0,
+      status: (json['status'] ?? 'on_track').toString(),
       member: DashboardMemberSummary.fromJson(json['member'] as Map<String, dynamic>),
-      pendingItemsCount: json['pending_items_count'] as int,
+      pendingItemsCount: (json['pending_items_count'] ?? json['pending_shopping_count'] ?? 0) as int,
     );
   }
 

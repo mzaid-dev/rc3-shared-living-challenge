@@ -12,7 +12,6 @@ import '../../../expenses/presentation/cubit/expenses_state.dart';
 import '../../../expenses/presentation/screens/expenses_and_settle_screen.dart';
 import '../../../expenses/presentation/widgets/add_expense_sheet.dart';
 import '../../../expenses/presentation/widgets/settle_up_dialog.dart';
-import '../../../home/presentation/widgets/home_header_menu.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../../shared_living/data/models/member.dart';
 import '../../../shopping/presentation/cubit/shopping_cubit.dart';
@@ -179,8 +178,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       isActive: activeMemberId == 'M03',
                       onTap: () => context.read<DashboardCubit>().switchMember('M03'),
                     ),
-                    const SizedBox(width: 10),
-                    HomeHeaderMenu(user: widget.user),
                   ],
                 ),
               ),

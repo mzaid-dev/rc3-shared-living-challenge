@@ -12,10 +12,12 @@ class AuthUser extends Equatable {
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
+    final member = json['member'] as Map<String, dynamic>?;
+    final user = json['user'] as Map<String, dynamic>?;
     return AuthUser(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
+      id: (member?['id'] ?? user?['id'] ?? json['id'] ?? '').toString(),
+      name: (member?['name'] ?? user?['display_name'] ?? json['name'] ?? '').toString(),
+      email: (user?['email'] ?? json['email'] ?? '').toString(),
     );
   }
 
