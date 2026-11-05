@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_living_app/features/assistant/data/repositories/mock_assistant_repository.dart';
+import 'package:shared_living_app/features/assistant/presentation/cubit/assistant_cubit.dart';
+import 'package:shared_living_app/features/assistant/presentation/screens/assistant_chat_screen.dart';
 import 'package:shared_living_app/features/auth/domain/models/auth_user.dart';
 import 'package:shared_living_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:shared_living_app/features/expenses/presentation/cubit/expenses_cubit.dart';
@@ -19,6 +22,7 @@ void main() {
           BlocProvider(create: (_) => DashboardCubit(repository: repository)),
           BlocProvider(create: (_) => ShoppingCubit(repository: repository)),
           BlocProvider(create: (_) => ExpensesCubit(repository: repository)),
+          BlocProvider(create: (_) => AssistantCubit(repository: MockAssistantRepository())),
         ],
         child: const MaterialApp(
           home: MainNavigationShell(user: demoUser),
@@ -61,5 +65,38 @@ void main() {
 
     expect(find.text('HOUSEHOLD APARTMENT'), findsOneWidget);
     expect(find.text('Gulberg 4B, Lahore'), findsOneWidget);
+  });
+
+  testWidgets('MainNavigationShell opens AssistantChatScreen from AppBar sparkle icon', (WidgetTester tester) async {
+    final repository = MockSharedLivingRepository(latency: Duration.zero);
+    const demoUser = AuthUser(id: 'M01', name: 'Ali', email: 'ali@demo.pk');
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => DashboardCubit(repository: repository)),
+          BlocProvider(create: (_) => ShoppingCubit(repository: repository)),
+          BlocProvider(create: (_) => ExpensesCubit(repository: repository)),
+          BlocProvider(create: (_) => AssistantCubit(repository: MockAssistantRepository())),
+        ],
+        child: const MaterialApp(
+          home: MainNavigationShell(user: demoUser),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify AI Assistant button exists in the AppBar
+    final assistantBtn = find.byTooltip('Hisab AI Assistant');
+    expect(assistantBtn, findsOneWidget);
+
+    // Tap the AI Assistant button
+    await tester.tap(assistantBtn);
+    await tester.pumpAndSettle();
+
+    // Verify AssistantChatScreen is pushed
+    expect(find.byType(AssistantChatScreen), findsOneWidget);
+    expect(find.text('Hisab Assistant'), findsOneWidget);
   });
 }

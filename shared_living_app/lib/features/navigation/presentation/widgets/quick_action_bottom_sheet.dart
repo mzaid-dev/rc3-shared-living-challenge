@@ -6,12 +6,14 @@ class QuickActionBottomSheet extends StatelessWidget {
   final VoidCallback onLogExpense;
   final VoidCallback onAddShoppingItem;
   final VoidCallback onRecordSettlement;
+  final VoidCallback? onOpenAssistant;
 
   const QuickActionBottomSheet({
     super.key,
     required this.onLogExpense,
     required this.onAddShoppingItem,
     required this.onRecordSettlement,
+    this.onOpenAssistant,
   });
 
   @override
@@ -64,6 +66,22 @@ class QuickActionBottomSheet extends StatelessWidget {
             style: TextStyle(fontSize: 12.5, color: AppColors.slate),
           ),
           const SizedBox(height: 18),
+
+          // Action 0: Ask Hisab AI Assistant
+          if (onOpenAssistant != null) ...[
+            _QuickActionTile(
+              icon: Icons.auto_awesome_rounded,
+              iconBg: AppColors.jade100,
+              iconFg: AppColors.jade800,
+              title: 'Ask Hisab Assistant',
+              subtitle: 'Add bills, check balances, or ask questions naturally',
+              onTap: () {
+                Navigator.of(context).pop();
+                onOpenAssistant!();
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
 
           // Action 1: Log Shared Expense
           _QuickActionTile(

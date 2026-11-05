@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/hisab_logo.dart';
+import '../../../assistant/presentation/screens/assistant_chat_screen.dart';
 import '../../../auth/domain/models/auth_user.dart';
 import '../../../dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../../dashboard/presentation/cubit/dashboard_state.dart';
@@ -97,6 +98,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     );
   }
 
+  void _openAssistantChat(BuildContext context, String activeMemberId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AssistantChatScreen(activeMemberId: activeMemberId),
+      ),
+    );
+  }
+
   void _openQuickActionSheet(BuildContext context, String activeMemberId, List<Member> members) {
     showModalBottomSheet(
       context: context,
@@ -106,6 +115,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         borderRadius: AppRadius.radiusSheetTop,
       ),
       builder: (sheetContext) => QuickActionBottomSheet(
+        onOpenAssistant: () => _openAssistantChat(context, activeMemberId),
         onLogExpense: () => _openAddExpenseModal(context, activeMemberId, members),
         onAddShoppingItem: () => _openAddShoppingModal(context),
         onRecordSettlement: () => _openRecordSettlementModal(context, members),
@@ -204,6 +214,44 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               ],
             ),
             actions: [
+              // Hisab AI Assistant Copilot Action Button
+              Padding(
+                padding: const EdgeInsets.only(right: 6.0),
+                child: IconButton(
+                  tooltip: 'Hisab AI Assistant',
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppColors.jade50,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.jade200, width: 1),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.auto_awesome_rounded, color: AppColors.jade700, size: 17),
+                        ),
+                      ),
+                      Positioned(
+                        right: -1,
+                        top: -1,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.jade500,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.surface, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  onPressed: () => _openAssistantChat(context, activeMemberId),
+                ),
+              ),
               // Roommate Avatars Stack (Ali, Ayesha, Bilal)
               Padding(
                 padding: const EdgeInsets.only(right: 14.0),
