@@ -268,7 +268,18 @@ app.include_router(budget.router)
 app.include_router(dashboard.router)
 app.include_router(audit.router)
 
-# Foundation Endpoint
+# Foundation Endpoints
+@app.get("/", tags=["Root"])
+def root():
+    """Root welcome endpoint with service status and documentation links."""
+    return {
+        "message": "RC3 Shared Living API is running",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/health",
+        "version": "1.0.0",
+    }
+
 @app.get("/health")
 def health_check():
     """System health check endpoint verifying database connectivity."""
