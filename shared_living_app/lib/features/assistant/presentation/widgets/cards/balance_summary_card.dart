@@ -55,25 +55,29 @@ class BalanceSummaryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Household Balance Ledger',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.ink,
+              const Expanded(
+                child: Text(
+                  'Household Balance Ledger',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Spacer(),
-              if (data.householdTotalSpent != null)
+              if (data.householdTotalSpent != null) ...[
+                const SizedBox(width: 6),
                 Text(
                   'Spent: PKR ${data.householdTotalSpent}',
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w600,
                     color: AppColors.slate,
                     fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
+              ],
             ],
           ),
           const SizedBox(height: 12),

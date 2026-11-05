@@ -97,12 +97,15 @@ class ExpenseSummaryCard extends StatelessWidget {
                 'Paid by: ',
                 style: TextStyle(fontSize: 12, color: AppColors.slate),
               ),
-              Text(
-                data.payerName,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.ink,
+              Flexible(
+                child: Text(
+                  data.payerName,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),

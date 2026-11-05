@@ -75,16 +75,19 @@ class ConfirmationCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                isConfirmed
-                    ? 'Action Confirmed'
-                    : (isCancelled ? 'Action Cancelled' : 'Action Confirmation Required'),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: isConfirmed
-                    ? AppColors.jade700
-                    : (isCancelled ? AppColors.slate : AppColors.amber700),
+              Expanded(
+                child: Text(
+                  isConfirmed
+                      ? 'Action Confirmed'
+                      : (isCancelled ? 'Action Cancelled' : 'Confirmation Required'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: isConfirmed
+                        ? AppColors.jade700
+                        : (isCancelled ? AppColors.slate : AppColors.amber700),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -256,13 +259,18 @@ class ConfirmationCard extends StatelessWidget {
             label,
             style: const TextStyle(fontSize: 12, color: AppColors.slate),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w700,
-              color: isHighlight ? AppColors.jade700 : AppColors.ink,
-              fontFeatures: isHighlight ? const [FontFeature.tabularFigures()] : null,
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w700,
+                color: isHighlight ? AppColors.jade700 : AppColors.ink,
+                fontFeatures: isHighlight ? const [FontFeature.tabularFigures()] : null,
+              ),
             ),
           ),
         ],
